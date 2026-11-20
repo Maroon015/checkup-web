@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Doctor dashboard')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <h1 th:text="${doctor.fullName}">Dr. Jordan Patel</h1>
+    <p class="muted" th:text="${doctor.specialty + ' · ' + doctor.clinic.name + ', ' + doctor.clinic.city}">Family Medicine · Northside, London</p>
+
+    <h2>Upcoming appointments</h2>
+    <p th:if="${#lists.isEmpty(appointments)}" class="muted">No upcoming appointments.</p>
+    <table th:unless="${#lists.isEmpty(appointments)}">
+        <thead>
+            <tr><th>When</th><th>Patient</th><th>Reason</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="a : ${appointments}">
+                <td th:text="${#temporals.format(a.startTime, 'EEE d MMM yyyy, h:mm a')}">Mon 1 Jan 2030, 9:00 AM</td>
+                <td th:text="${a.patient.fullName}">Alex Morgan</td>
+                <td th:text="${a.reason}">Annual check-up</td>
+                <td><span class="status" th:classappend="${#strings.toLowerCase(a.status)}" th:text="${a.status}">CONFIRMED</span></td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

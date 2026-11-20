@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Sign up')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="narrow">
+    <h1>Create a patient account</h1>
+
+    <!-- th:object binds the form to the RegistrationForm in the model. th:field fills in
+         name/value, so typed values survive when the page comes back with errors.
+         th:errors shows that field's validation message. -->
+    <form th:action="@{/register}" th:object="${form}" method="post" class="stack" novalidate>
+        <label>First name
+            <input type="text" th:field="*{firstName}" autocomplete="given-name">
+            <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+        </label>
+        <label>Last name
+            <input type="text" th:field="*{lastName}" autocomplete="family-name">
+            <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+        </label>
+        <label>Email
+            <input type="email" th:field="*{email}" autocomplete="email">
+            <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </label>
+        <label>Date of birth
+            <input type="date" th:field="*{dateOfBirth}">
+            <span class="field-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
+        </label>
+        <label>Password (8+ characters)
+            <input type="password" th:field="*{password}" autocomplete="new-password">
+            <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+        </label>
+        <label>Confirm password
+            <input type="password" th:field="*{confirmPassword}" autocomplete="new-password">
+            <span class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+        </label>
+        <button type="submit">Create account</button>
+    </form>
+    <p>Already have an account? <a th:href="@{/login}">Log in</a></p>
+</main>
+</body>
+</html>

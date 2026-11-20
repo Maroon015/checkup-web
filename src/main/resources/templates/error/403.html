@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<!-- Spring Boot shows templates/error/403.html automatically for "403 Forbidden":
+     logged in, but this page belongs to a different role. -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Not allowed')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="narrow">
+    <h1>You can't open that page</h1>
+    <p>Your account doesn't have access to this part of checkUp.</p>
+    <p><a th:href="@{/dashboard}">Go to my dashboard</a></p>
+</main>
+</body>
+</html>

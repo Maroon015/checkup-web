@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.checkup.account.UserAccount;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -95,6 +100,11 @@ public class Patient {
     // One patient -> many phone numbers.
     // cascade = ALL: saving/deleting the patient also saves/deletes their phones.
     // orphanRemoval: a phone removed from this list is deleted from the database.
+    // The login this patient uses (added in V2). One account <-> one patient profile.
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private UserAccount user;
+
     // List<@Valid PhoneNumber>: also check the rules on every phone inside the list.
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<@Valid PhoneNumber> phones = new ArrayList<>();
@@ -165,4 +175,6 @@ public class Patient {
     public void setHeightCm(Double heightCm) { this.heightCm = heightCm; }
     public void setWeightKg(Double weightKg) { this.weightKg = weightKg; }
     public void setMedicalHistory(String medicalHistory) { this.medicalHistory = medicalHistory; }
+    public UserAccount getUser() { return user; }
+    public void setUser(UserAccount user) { this.user = user; }
 }

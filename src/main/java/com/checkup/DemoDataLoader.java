@@ -12,6 +12,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.checkup.account.AccountService;
+import com.checkup.account.DemoAccounts;
 import com.checkup.appointment.Appointment;
 import com.checkup.appointment.AppointmentRepository;
 import com.checkup.appointment.AppointmentStatus;
@@ -46,14 +48,17 @@ public class DemoDataLoader implements ApplicationRunner {
     private final DoctorRepository doctors;
     private final PatientRepository patients;
     private final AppointmentRepository appointments;
+    private final AccountService accountService;
 
     // Constructor injection: Spring sees these parameters and passes in the repositories.
     public DemoDataLoader(ClinicRepository clinics, DoctorRepository doctors,
-                          PatientRepository patients, AppointmentRepository appointments) {
+                          PatientRepository patients, AppointmentRepository appointments,
+                          AccountService accountService) {
         this.clinics = clinics;
         this.doctors = doctors;
         this.patients = patients;
         this.appointments = appointments;
+        this.accountService = accountService;
     }
 
     @Override
@@ -68,7 +73,7 @@ public class DemoDataLoader implements ApplicationRunner {
         Clinic lakeshore = clinics.save(new Clinic("Lakeshore Medical", "8 Harbour Rd", "Toronto"));
 
         Doctor patel = doctors.save(new Doctor("Jordan", "Patel", "Family Medicine",
-                "jordan.patel@example.com", "5195550199", northside));
+                DemoAccounts.DOCTOR_EMAIL, "5195550199", northside));
         Doctor chen = doctors.save(new Doctor("Mei", "Chen", "Pediatrics",
                 "mei.chen@example.com", "5195550188", northside));
         Doctor okafor = doctors.save(new Doctor("Daniel", "Okafor", "Cardiology",
@@ -76,7 +81,7 @@ public class DemoDataLoader implements ApplicationRunner {
         doctors.save(new Doctor("Sofia", "Rossi", "Dermatology",
                 "sofia.rossi@example.com", "4165550166", lakeshore));
 
-        Patient alex = new Patient("Alex", "Morgan", "alex.morgan@example.com", LocalDate.of(1991, 4, 12));
+        Patient alex = new Patient("Alex", "Morgan", DemoAccounts.PATIENT_EMAIL, LocalDate.of(1991, 4, 12));
         alex.setCity("London");
         alex.setStreet("Maple Ave");
         alex.setUnitNumber("12");
@@ -98,6 +103,12 @@ public class DemoDataLoader implements ApplicationRunner {
         sam.addPhone(new PhoneNumber(PhoneType.PERSONAL, "5195550102"));
         sam.addPhone(new PhoneNumber(PhoneType.EMERGENCY, "5195550103"));
         patients.save(sam);
+
+        // Logins for the "Log in as demo ..." buttons. AccountService hashes the password.
+        accountService.createPatientLogin(alex, DemoAccounts.PASSWORD);
+        accountService.createPatientLogin(sam, DemoAccounts.PASSWORD);
+        accountService.createDoctorLogin(patel, DemoAccounts.PASSWORD);
+        accountService.createAdmin(DemoAccounts.ADMIN_EMAIL, DemoAccounts.PASSWORD);
 
         LocalDate today = LocalDate.now();
         Appointment checkup = new Appointment(alex, patel,

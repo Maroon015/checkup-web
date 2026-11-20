@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <h1>Admin overview</h1>
+    <ul class="stats">
+        <li><strong th:text="${accountCount}">0</strong> accounts</li>
+        <li><strong th:text="${clinicCount}">0</strong> clinics</li>
+        <li><strong th:text="${doctorCount}">0</strong> doctors</li>
+        <li><strong th:text="${patientCount}">0</strong> patients</li>
+        <li><strong th:text="${appointmentCount}">0</strong> appointments</li>
+    </ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!--
+  Pieces shared by every page. A page pulls them in with
+    <head th:replace="~{fragments :: head('Page title')}"></head>
+    <header th:replace="~{fragments :: nav}"></header>
+  so the nav bar is written once instead of copied into each page.
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | checkUp'">checkUp</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body>
+<header th:fragment="nav" class="nav">
+    <a class="brand" th:href="@{/}">checkUp</a>
+    <nav>
+        <th:block th:if="${currentUser == null}">
+            <a th:href="@{/login}">Log in</a>
+            <a th:href="@{/register}">Sign up</a>
+        </th:block>
+        <th:block th:if="${currentUser != null}">
+            <a th:href="@{/dashboard}">My dashboard</a>
+            <span class="muted" th:text="${currentUser.username}">alex@example.com</span>
+            <!-- Logout is a POST with the CSRF token (th:action adds it), not a plain link,
+                 so another site can't log you out by embedding a link. -->
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link">Log out</button>
+            </form>
+        </th:block>
+    </nav>
+</header>
+</body>
+</html>

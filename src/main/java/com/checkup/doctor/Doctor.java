@@ -1,5 +1,6 @@
 package com.checkup.doctor;
 
+import com.checkup.account.UserAccount;
 import com.checkup.clinic.Clinic;
 
 import jakarta.persistence.Column;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -67,6 +69,12 @@ public class Doctor {
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
 
+    // The login this doctor uses (added in V2). Optional: a doctor can be listed
+    // before they have an account.
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private UserAccount user;
+
     protected Doctor() {
     }
 
@@ -102,4 +110,6 @@ public class Doctor {
     public void setPhone(String phone) { this.phone = phone; }
     public void setFax(String fax) { this.fax = fax; }
     public void setClinic(Clinic clinic) { this.clinic = clinic; }
+    public UserAccount getUser() { return user; }
+    public void setUser(UserAccount user) { this.user = user; }
 }

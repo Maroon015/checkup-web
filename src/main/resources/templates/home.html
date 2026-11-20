@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${appName}">checkUp</title>
-</head>
+<head th:replace="~{fragments :: head(${appName})}"></head>
 <body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p class="notice" th:if="${param.loggedOut}">You've been logged out.</p>
     <h1>Welcome to <span th:text="${appName}">checkUp</span></h1>
     <p>Book appointments with doctors at clinics near you.</p>
+    <p th:if="${currentUser == null}">
+        <a class="button" th:href="@{/login}">Log in</a>
+        <a class="button secondary" th:href="@{/register}">Create a patient account</a>
+    </p>
+</main>
 </body>
 </html>

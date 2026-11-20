@@ -16,6 +16,9 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     boolean existsByEmailIgnoreCase(String email);
 
+    /** The patient profile that belongs to a login account. */
+    Optional<Patient> findByUser_Id(Long userId);
+
     // For the doctor's patient search later: "mor" finds "Alex Morgan".
     List<Patient> findByLastNameContainingIgnoreCaseOrderByLastName(String lastNamePart);
 }
