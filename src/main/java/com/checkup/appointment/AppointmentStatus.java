@@ -7,7 +7,7 @@ package com.checkup.appointment;
  *       \                                \
  *        `---------(cancelled)------------`--> CANCELLED
  *
- * The rules for moving between states come in step 4.
+ * The rules for moving between states live in Appointment (confirm, complete, cancel...).
  */
 public enum AppointmentStatus {
     REQUESTED,

@@ -4,14 +4,16 @@
 <body>
 <header th:replace="~{fragments :: nav}"></header>
 <main>
+    <div th:replace="~{fragments :: flash}"></div>
     <h1 th:text="${doctor.fullName}">Dr. Jordan Patel</h1>
     <p class="muted" th:text="${doctor.specialty + ' · ' + doctor.clinic.name + ', ' + doctor.clinic.city}">Family Medicine · Northside, London</p>
+    <p><a class="button secondary" th:href="@{/doctor/hours}">My weekly hours</a></p>
 
-    <h2>Upcoming appointments</h2>
-    <p th:if="${#lists.isEmpty(appointments)}" class="muted">No upcoming appointments.</p>
+    <h2>Schedule from today</h2>
+    <p th:if="${#lists.isEmpty(appointments)}" class="muted">No appointments from today on.</p>
     <table th:unless="${#lists.isEmpty(appointments)}">
         <thead>
-            <tr><th>When</th><th>Patient</th><th>Reason</th><th>Status</th></tr>
+            <tr><th>When</th><th>Patient</th><th>Reason</th><th>Status</th><th></th></tr>
         </thead>
         <tbody>
             <tr th:each="a : ${appointments}">
@@ -19,6 +21,23 @@
                 <td th:text="${a.patient.fullName}">Alex Morgan</td>
                 <td th:text="${a.reason}">Annual check-up</td>
                 <td><span class="status" th:classappend="${#strings.toLowerCase(a.status)}" th:text="${a.status}">CONFIRMED</span></td>
+                <td class="actions">
+                    <!-- Each action is a small POST form (with the CSRF token), shown only
+                         when the rules allow it. The server re-checks every rule. -->
+                    <form th:if="${a.status.name() == 'REQUESTED'}"
+                          th:action="@{/doctor/appointments/{id}/confirm(id=${a.id})}" method="post">
+                        <button type="submit" class="small">Confirm</button>
+                    </form>
+                    <form th:if="${a.canBeCompleted(now)}"
+                          th:action="@{/doctor/appointments/{id}/complete(id=${a.id})}" method="post">
+                        <button type="submit" class="small">Mark completed</button>
+                    </form>
+                    <form th:if="${a.canBeCancelledByDoctor(now)}"
+                          th:action="@{/doctor/appointments/{id}/cancel(id=${a.id})}" method="post"
+                          onsubmit="return confirm('Cancel this appointment?');">
+                        <button type="submit" class="secondary small">Cancel</button>
+                    </form>
+                </td>
             </tr>
         </tbody>
     </table>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Confirm booking')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="narrow">
+    <p><a th:href="@{/patient/book/{id}(id=${doctor.id}, date=${start.toLocalDate()})}">&larr; Pick a different time</a></p>
+    <h1>Book this appointment</h1>
+    <dl class="summary">
+        <dt>Doctor</dt><dd th:text="${doctor.fullName}">Dr. Jordan Patel</dd>
+        <dt>Clinic</dt><dd th:text="${doctor.clinic.name + ', ' + doctor.clinic.streetAddress + ', ' + doctor.clinic.city}">Northside</dd>
+        <dt>When</dt><dd th:text="${#temporals.format(start, 'EEEE d MMMM yyyy, h:mm a')}">Monday 23 November 2026, 9:00 AM</dd>
+    </dl>
+
+    <form th:action="@{/patient/book/{id}(id=${doctor.id})}" method="post" class="stack">
+        <input type="hidden" name="start" th:value="${start}">
+        <label>What is the appointment for?
+            <textarea name="reason" rows="3" maxlength="500" required placeholder="e.g. Annual check-up"></textarea>
+        </label>
+        <button type="submit">Request appointment</button>
+    </form>
+    <p class="muted small">You can cancel online up to 24 hours before the appointment.</p>
+</main>
+</body>
+</html>

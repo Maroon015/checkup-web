@@ -33,5 +33,12 @@
         </th:block>
     </nav>
 </header>
+
+<!-- One-time messages after an action ("Appointment cancelled.", or why it failed).
+     They come from RedirectAttributes.addFlashAttribute and disappear on the next page. -->
+<div th:fragment="flash">
+    <p class="notice" th:if="${success}" th:text="${success}">Done.</p>
+    <p class="error" th:if="${error}" th:text="${error}">Something went wrong.</p>
+</div>
 </body>
 </html>

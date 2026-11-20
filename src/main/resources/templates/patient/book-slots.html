@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Choose a time')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/patient/book}">&larr; Choose a different doctor</a></p>
+    <div th:replace="~{fragments :: flash}"></div>
+    <h1 th:text="${doctor.fullName}">Dr. Jordan Patel</h1>
+    <p class="muted" th:text="${doctor.specialty + ' · ' + doctor.clinic.name + ', ' + doctor.clinic.streetAddress + ', ' + doctor.clinic.city}">
+        Family Medicine · Northside, 120 Maple Ave, London</p>
+
+    <h2>Day</h2>
+    <nav class="days" aria-label="Choose a day">
+        <a th:each="d : ${days}"
+           th:href="@{/patient/book/{id}(id=${doctor.id}, date=${d})}"
+           th:classappend="${d == day} ? 'selected'"
+           th:attr="aria-current=${d == day} ? 'date'">
+            <span th:text="${#temporals.format(d, 'EEE')}">Mon</span>
+            <strong th:text="${#temporals.format(d, 'd MMM')}">23 Nov</strong>
+        </a>
+    </nav>
+
+    <h2>Open times on <span th:text="${#temporals.format(day, 'EEEE d MMMM')}">Monday 23 November</span></h2>
+    <p th:if="${#lists.isEmpty(slots)}" class="muted">No open times on this day. Try another day.</p>
+    <div class="slots" th:unless="${#lists.isEmpty(slots)}">
+        <a th:each="s : ${slots}" class="button secondary"
+           th:href="@{/patient/book/{id}/confirm(id=${doctor.id}, start=${s.param()})}"
+           th:text="${#temporals.format(s.start, 'h:mm a')}">9:00 AM</a>
+    </div>
+</main>
+</body>
+</html>

@@ -15,6 +15,14 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     // instead of getting a null by surprise.
     Optional<Doctor> findByEmailIgnoreCase(String email);
 
+    /** All doctors with their clinics, for the "choose a doctor" page. */
+    @EntityGraph(attributePaths = "clinic")
+    List<Doctor> findAllByOrderByLastNameAscFirstNameAsc();
+
+    /** One doctor with their clinic. ("WithClinic" is just a readable name; Spring ignores it.) */
+    @EntityGraph(attributePaths = "clinic")
+    Optional<Doctor> findWithClinicById(Long id);
+
     /** The doctor profile that belongs to a login account, with its clinic loaded. */
     @EntityGraph(attributePaths = "clinic")
     Optional<Doctor> findByUser_Id(Long userId);

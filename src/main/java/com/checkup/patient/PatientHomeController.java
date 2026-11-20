@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.checkup.account.CurrentUser;
 import com.checkup.appointment.AppointmentRepository;
+import com.checkup.appointment.SchedulingService;
 
 /**
  * The patient's home page. Only reachable with the PATIENT role (SecurityConfig).
@@ -19,10 +20,13 @@ public class PatientHomeController {
 
     private final PatientRepository patients;
     private final AppointmentRepository appointments;
+    private final SchedulingService scheduling;
 
-    public PatientHomeController(PatientRepository patients, AppointmentRepository appointments) {
+    public PatientHomeController(PatientRepository patients, AppointmentRepository appointments,
+                                 SchedulingService scheduling) {
         this.patients = patients;
         this.appointments = appointments;
+        this.scheduling = scheduling;
     }
 
     @GetMapping("/patient")
@@ -31,6 +35,7 @@ public class PatientHomeController {
                 .orElseThrow(() -> new IllegalStateException("No patient profile for account " + me.getId()));
         model.addAttribute("patient", patient);
         model.addAttribute("appointments", appointments.findByPatient_IdOrderByStartTime(patient.getId()));
+        model.addAttribute("now", scheduling.now()); // decides which "Cancel" buttons show
         return "patient/home";
     }
 }

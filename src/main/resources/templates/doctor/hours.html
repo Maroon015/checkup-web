@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('My weekly hours')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/doctor}">&larr; Back to my schedule</a></p>
+    <div th:replace="~{fragments :: flash}"></div>
+    <h1>My weekly hours</h1>
+    <p class="muted">Patients can book times inside these hours. Removing hours doesn't cancel appointments that are already booked.</p>
+
+    <p th:if="${#lists.isEmpty(hours)}" class="muted">No hours set yet, so patients can't book with you.</p>
+    <table th:unless="${#lists.isEmpty(hours)}">
+        <thead>
+            <tr><th>Day</th><th>From</th><th>To</th><th>Appointment length</th><th></th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="h : ${hours}">
+                <td th:text="${#strings.capitalize(#strings.toLowerCase(h.dayOfWeek))}">Monday</td>
+                <td th:text="${#temporals.format(h.startTime, 'h:mm a')}">9:00 AM</td>
+                <td th:text="${#temporals.format(h.endTime, 'h:mm a')}">12:00 PM</td>
+                <td th:text="${h.slotMinutes + ' min'}">30 min</td>
+                <td>
+                    <form th:action="@{/doctor/hours/{id}/delete(id=${h.id})}" method="post">
+                        <button type="submit" class="secondary small">Remove</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Add hours</h2>
+    <form th:action="@{/doctor/hours}" method="post" class="row">
+        <label>Day
+            <select name="day">
+                <option th:each="d : ${days}" th:value="${d}"
+                        th:text="${#strings.capitalize(#strings.toLowerCase(d))}">Monday</option>
+            </select>
+        </label>
+        <label>From <input type="time" name="start" value="09:00" required></label>
+        <label>To <input type="time" name="end" value="12:00" required></label>
+        <label>Length
+            <select name="slotMinutes">
+                <option value="15">15 min</option>
+                <option value="20">20 min</option>
+                <option value="30" selected>30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+            </select>
+        </label>
+        <button type="submit">Add</button>
+    </form>
+</main>
+</body>
+</html>

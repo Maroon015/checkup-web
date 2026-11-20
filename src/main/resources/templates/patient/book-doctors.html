@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Book an appointment')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/patient}">&larr; Back to my appointments</a></p>
+    <h1>Choose a doctor</h1>
+    <table>
+        <thead>
+            <tr><th>Doctor</th><th>Specialty</th><th>Clinic</th><th></th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="d : ${doctors}">
+                <td th:text="${d.fullName}">Dr. Jordan Patel</td>
+                <td th:text="${d.specialty}">Family Medicine</td>
+                <td th:text="${d.clinic.name + ', ' + d.clinic.city}">Northside, London</td>
+                <td><a class="button small" th:href="@{/patient/book/{id}(id=${d.id})}">See open times</a></td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

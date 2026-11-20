@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
@@ -17,11 +19,39 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @EntityGraph(attributePaths = {"doctor", "doctor.clinic"})
     List<Appointment> findByPatient_IdOrderByStartTime(Long patientId);
 
-    /** A doctor's schedule between two times (finding free slots, step 4). */
+    /** A doctor's schedule between two times. */
     List<Appointment> findByDoctor_IdAndStartTimeBetweenOrderByStartTime(
             Long doctorId, LocalDateTime from, LocalDateTime to);
 
-    /** A doctor's upcoming appointments with the patient loaded (doctor dashboard). */
+    /** A doctor's appointments from a time onwards, with the patient loaded (doctor dashboard). */
     @EntityGraph(attributePaths = {"patient"})
     List<Appointment> findByDoctor_IdAndStartTimeGreaterThanEqualOrderByStartTime(Long doctorId, LocalDateTime from);
+
+    /**
+     * The doctor's active (not cancelled or completed) appointments that overlap [from, to).
+     * Two time ranges overlap when each one starts before the other ends.
+     * Written in JPQL: like SQL, but using Java class and field names.
+     */
+    @Query("""
+            select a from Appointment a
+            where a.doctor.id = :doctorId
+              and a.status in (com.checkup.appointment.AppointmentStatus.REQUESTED,
+                               com.checkup.appointment.AppointmentStatus.CONFIRMED)
+              and a.startTime < :to and a.endTime > :from
+            """)
+    List<Appointment> findActiveForDoctorOverlapping(@Param("doctorId") Long doctorId,
+                                                     @Param("from") LocalDateTime from,
+                                                     @Param("to") LocalDateTime to);
+
+    /** Same, for one patient: stops a patient booking two places at once. */
+    @Query("""
+            select a from Appointment a
+            where a.patient.id = :patientId
+              and a.status in (com.checkup.appointment.AppointmentStatus.REQUESTED,
+                               com.checkup.appointment.AppointmentStatus.CONFIRMED)
+              and a.startTime < :to and a.endTime > :from
+            """)
+    List<Appointment> findActiveForPatientOverlapping(@Param("patientId") Long patientId,
+                                                      @Param("from") LocalDateTime from,
+                                                      @Param("to") LocalDateTime to);
 }

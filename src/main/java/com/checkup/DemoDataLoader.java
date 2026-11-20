@@ -1,8 +1,10 @@
 package com.checkup;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,8 @@ import com.checkup.account.AccountService;
 import com.checkup.account.DemoAccounts;
 import com.checkup.appointment.Appointment;
 import com.checkup.appointment.AppointmentRepository;
-import com.checkup.appointment.AppointmentStatus;
+import com.checkup.appointment.Availability;
+import com.checkup.appointment.AvailabilityRepository;
 import com.checkup.clinic.Clinic;
 import com.checkup.clinic.ClinicRepository;
 import com.checkup.doctor.Doctor;
@@ -48,16 +51,18 @@ public class DemoDataLoader implements ApplicationRunner {
     private final DoctorRepository doctors;
     private final PatientRepository patients;
     private final AppointmentRepository appointments;
+    private final AvailabilityRepository availability;
     private final AccountService accountService;
 
     // Constructor injection: Spring sees these parameters and passes in the repositories.
     public DemoDataLoader(ClinicRepository clinics, DoctorRepository doctors,
                           PatientRepository patients, AppointmentRepository appointments,
-                          AccountService accountService) {
+                          AvailabilityRepository availability, AccountService accountService) {
         this.clinics = clinics;
         this.doctors = doctors;
         this.patients = patients;
         this.appointments = appointments;
+        this.availability = availability;
         this.accountService = accountService;
     }
 
@@ -78,7 +83,7 @@ public class DemoDataLoader implements ApplicationRunner {
                 "mei.chen@example.com", "5195550188", northside));
         Doctor okafor = doctors.save(new Doctor("Daniel", "Okafor", "Cardiology",
                 "daniel.okafor@example.com", "5195550177", riverside));
-        doctors.save(new Doctor("Sofia", "Rossi", "Dermatology",
+        Doctor rossi = doctors.save(new Doctor("Sofia", "Rossi", "Dermatology",
                 "sofia.rossi@example.com", "4165550166", lakeshore));
 
         Patient alex = new Patient("Alex", "Morgan", DemoAccounts.PATIENT_EMAIL, LocalDate.of(1991, 4, 12));
@@ -110,18 +115,39 @@ public class DemoDataLoader implements ApplicationRunner {
         accountService.createDoctorLogin(patel, DemoAccounts.PASSWORD);
         accountService.createAdmin(DemoAccounts.ADMIN_EMAIL, DemoAccounts.PASSWORD);
 
+        // Weekly hours (step 4). Free slots are worked out from these.
+        for (DayOfWeek day : List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
+                                     DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)) {
+            availability.save(new Availability(patel, day, LocalTime.of(9, 0), LocalTime.of(12, 0), 30));
+            availability.save(new Availability(patel, day, LocalTime.of(13, 0), LocalTime.of(16, 0), 30));
+        }
+        for (DayOfWeek day : List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)) {
+            availability.save(new Availability(chen, day, LocalTime.of(9, 0), LocalTime.of(15, 0), 20));
+        }
+        for (DayOfWeek day : List.of(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY)) {
+            availability.save(new Availability(okafor, day, LocalTime.of(10, 0), LocalTime.of(16, 0), 45));
+        }
+        for (DayOfWeek day : List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)) {
+            availability.save(new Availability(rossi, day, LocalTime.of(9, 0), LocalTime.of(17, 0), 30));
+        }
+
+        // Status changes go through the rule methods (confirm, complete), never setStatus.
         LocalDate today = LocalDate.now();
         Appointment checkup = new Appointment(alex, patel,
                 at(today.plusDays(2), 9, 0), at(today.plusDays(2), 9, 30), "Annual check-up");
-        checkup.setStatus(AppointmentStatus.CONFIRMED);
+        checkup.confirm();
         appointments.save(checkup);
 
         appointments.save(new Appointment(sam, okafor,
-                at(today.plusDays(3), 14, 0), at(today.plusDays(3), 14, 30), "Follow-up on chest pain"));
+                at(today.plusDays(3), 14, 0), at(today.plusDays(3), 14, 45), "Follow-up on chest pain"));
+
+        appointments.save(new Appointment(sam, patel,
+                at(today.plusDays(4), 10, 0), at(today.plusDays(4), 10, 30), "Knee pain follow-up"));
 
         Appointment past = new Appointment(sam, patel,
                 at(today.minusDays(10), 10, 0), at(today.minusDays(10), 10, 30), "Knee pain");
-        past.setStatus(AppointmentStatus.COMPLETED);
+        past.confirm();
+        past.complete(LocalDateTime.now());
         appointments.save(past);
 
         log.info("Loaded demo data: {} clinics, {} doctors, {} patients, {} appointments",
