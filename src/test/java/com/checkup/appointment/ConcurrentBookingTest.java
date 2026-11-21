@@ -38,8 +38,15 @@ import com.checkup.patient.PatientRepository;
  * database sees two genuinely separate bookings). Exactly one must win.
  *
  * Repeated a few times, because a race that passes once could just be lucky timing.
+ *
+ * Uses its OWN in-memory database ("race"), because cleanUp() deletes every row: on the
+ * shared test database that would wipe the demo data other test classes rely on, and the
+ * suite would only pass when this class happened to run first.
  */
-@SpringBootTest(properties = "checkup.demo-data.enabled=false")
+@SpringBootTest(properties = {
+        "checkup.demo-data.enabled=false",
+        "spring.datasource.url=jdbc:h2:mem:race;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE"
+})
 class ConcurrentBookingTest {
 
     @Autowired SchedulingService scheduling;

@@ -1,0 +1,41 @@
+# Run the whole app (web + PostgreSQL) on your own computer with one command:
+#
+#     docker compose up --build
+#
+# then open http://localhost:8080. Stop with Ctrl+C; add -v to "docker compose down -v"
+# to also delete the database.
+#
+# The passwords below are for this LOCAL setup only. A real server gets its own secret
+# values through the hosting provider's environment settings, never from this file.
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: checkup
+      POSTGRES_USER: checkup
+      POSTGRES_PASSWORD: local-dev-only
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U checkup -d checkup"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy   # wait until Postgres accepts connections
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/checkup
+      DB_USERNAME: checkup
+      DB_PASSWORD: local-dev-only
+      # Local runs are plain http, so allow the session cookie without https.
+      SERVER_SERVLET_SESSION_COOKIE_SECURE: "false"
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:
