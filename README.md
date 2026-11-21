@@ -8,9 +8,10 @@ own patients, and every look at a record is logged where the patient can see it.
 
 Built with Java 25, Spring Boot 4, PostgreSQL and Thymeleaf.
 
-**Live demo:** _coming soon_ <!-- TODO: add the deployed URL -->
+**Live demo: https://checkup-web-fob5.onrender.com**
 Click **"Log in as demo patient"** or **"Log in as demo doctor"** on the login page. All data
-in the demo is made up.
+in the demo is made up. It runs on Render's free tier, so the first visit after a quiet spell
+can take up to a minute while the server wakes up.
 
 <!-- TODO: screenshots / GIF of booking a slot, the doctor dashboard, and "Who has seen my record" -->
 
