@@ -1,7 +1,6 @@
 # checkUp
 
-<!-- TODO after the GitHub repo exists: replace OWNER/REPO in the badge below. -->
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/Maroon015/checkup-web/actions/workflows/ci.yml/badge.svg)](https://github.com/Maroon015/checkup-web/actions/workflows/ci.yml)
 
 **A clinic booking and patient-records web app.** Patients find a clinic, book an open time
 with a doctor and manage their medical record. Doctors run their schedule and see only their
