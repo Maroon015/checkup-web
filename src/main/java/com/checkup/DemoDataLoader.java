@@ -18,6 +18,11 @@ import com.checkup.account.AccountService;
 import com.checkup.account.DemoAccounts;
 import com.checkup.appointment.Appointment;
 import com.checkup.appointment.AppointmentRepository;
+import com.checkup.careers.JobApplication;
+import com.checkup.careers.JobApplicationRepository;
+import com.checkup.careers.Position;
+import com.checkup.patient.ClinicalNote;
+import com.checkup.patient.ClinicalNoteRepository;
 import com.checkup.appointment.Availability;
 import com.checkup.appointment.AvailabilityRepository;
 import com.checkup.clinic.Clinic;
@@ -53,11 +58,16 @@ public class DemoDataLoader implements ApplicationRunner {
     private final AppointmentRepository appointments;
     private final AvailabilityRepository availability;
     private final AccountService accountService;
+    private final ClinicalNoteRepository notes;
+    private final JobApplicationRepository applications;
 
     // Constructor injection: Spring sees these parameters and passes in the repositories.
     public DemoDataLoader(ClinicRepository clinics, DoctorRepository doctors,
                           PatientRepository patients, AppointmentRepository appointments,
-                          AvailabilityRepository availability, AccountService accountService) {
+                          AvailabilityRepository availability, AccountService accountService,
+                          ClinicalNoteRepository notes, JobApplicationRepository applications) {
+        this.notes = notes;
+        this.applications = applications;
         this.clinics = clinics;
         this.doctors = doctors;
         this.patients = patients;
@@ -149,6 +159,12 @@ public class DemoDataLoader implements ApplicationRunner {
         past.confirm();
         past.complete(LocalDateTime.now());
         appointments.save(past);
+
+        // A clinical note and a job application, so those pages aren't empty in the demo.
+        notes.save(new ClinicalNote(sam, patel, LocalDateTime.now().minusDays(10).withHour(10).withMinute(25),
+                "Right knee pain on stairs, no swelling. Advised physiotherapy; review in 4 weeks."));
+        applications.save(new JobApplication("Jamie Rivera", "jamie.rivera@example.com", "5195550142",
+                Position.PHARMACIST, 6, "Weekdays, from January", LocalDateTime.now().minusDays(1)));
 
         log.info("Loaded demo data: {} clinics, {} doctors, {} patients, {} appointments",
                 clinics.count(), doctors.count(), patients.count(), appointments.count());

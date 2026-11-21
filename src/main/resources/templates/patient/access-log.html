@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Who has seen my record')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/patient/profile}">&larr; Back to my record</a></p>
+    <h1>Who has seen my record</h1>
+    <p class="muted">Every time a doctor opens your record, or your record is changed, it's listed here.
+        Nobody using checkUp can edit or delete this list.</p>
+
+    <p th:if="${#lists.isEmpty(entries)}" class="muted">Nobody has opened or changed your record yet.</p>
+    <table th:unless="${#lists.isEmpty(entries)}">
+        <thead><tr><th>When</th><th>Who</th><th>What</th></tr></thead>
+        <tbody>
+            <tr th:each="e : ${entries}">
+                <td th:text="${#temporals.format(e.occurredAt, 'EEE d MMM yyyy, h:mm a')}">Mon 1 Jan 2030, 9:00 AM</td>
+                <td>
+                    <span th:if="${e.actorUserId == myUserId}">You</span>
+                    <span th:unless="${e.actorUserId == myUserId}" th:text="${e.actorName}">Dr. Jordan Patel</span>
+                    <span class="muted small" th:unless="${e.actorUserId == myUserId}"
+                          th:text="${'(' + #strings.toLowerCase(e.actorRole) + ')'}">(doctor)</span>
+                </td>
+                <td>
+                    <span th:text="${e.action.label}">Viewed record</span>
+                    <span class="muted small" th:if="${e.details}" th:text="${'· ' + e.details}">· Changed: weight</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

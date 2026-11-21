@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Audit log')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/admin}">&larr; Admin overview</a></p>
+    <h1>Audit log</h1>
+    <p class="muted">Latest 100 of <span th:text="${total}">0</span> entries. The app has no way to change or delete entries.</p>
+
+    <p th:if="${#lists.isEmpty(entries)}" class="muted">No entries yet.</p>
+    <table th:unless="${#lists.isEmpty(entries)}">
+        <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Patient id</th><th>Details</th></tr></thead>
+        <tbody>
+            <tr th:each="e : ${entries}">
+                <td th:text="${#temporals.format(e.occurredAt, 'd MMM yyyy, h:mm:ss a')}">1 Jan 2030, 9:00:00 AM</td>
+                <td th:text="${e.actorName + ' (' + e.actorRole + ')'}">Dr. Jordan Patel (DOCTOR)</td>
+                <td th:text="${e.action.label}">Viewed record</td>
+                <td th:text="${e.patientId} ?: '—'">1</td>
+                <td th:text="${e.details} ?: ''"></td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

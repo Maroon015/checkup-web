@@ -1,6 +1,9 @@
 package com.checkup.patient;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -84,6 +87,25 @@ public class ProfileForm {
         p.setHeightCm(heightCm);
         p.setWeightKg(weightKg);
         p.setMedicalHistory(blankToNull(medicalHistory));
+    }
+
+    /**
+     * Which fields this form would change, in plain words ("blood type", "weight").
+     * Used for the audit log, which records WHAT changed but never the values.
+     */
+    List<String> changedFieldsComparedTo(Patient p) {
+        List<String> changed = new ArrayList<>();
+        if (!Objects.equals(firstName.trim(), p.getFirstName())) changed.add("first name");
+        if (!Objects.equals(lastName.trim(), p.getLastName())) changed.add("last name");
+        if (!Objects.equals(dateOfBirth, p.getDateOfBirth())) changed.add("date of birth");
+        if (!Objects.equals(blankToNull(city), p.getCity())
+                || !Objects.equals(blankToNull(street), p.getStreet())
+                || !Objects.equals(blankToNull(unitNumber), p.getUnitNumber())) changed.add("address");
+        if (bloodType != p.getBloodType()) changed.add("blood type");
+        if (!Objects.equals(heightCm, p.getHeightCm())) changed.add("height");
+        if (!Objects.equals(weightKg, p.getWeightKg())) changed.add("weight");
+        if (!Objects.equals(blankToNull(medicalHistory), p.getMedicalHistory())) changed.add("medical history");
+        return changed;
     }
 
     private static String blankToNull(String s) {

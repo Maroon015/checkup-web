@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Careers')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main class="narrow">
+    <div th:replace="~{fragments :: flash}"></div>
+    <h1>Work with us</h1>
+    <p class="muted">We're hiring surgeons, pharmacists and doctor's assistants at our clinics.</p>
+
+    <form th:action="@{/careers}" th:object="${form}" method="post" class="stack" novalidate>
+        <label>Full name
+            <input type="text" th:field="*{fullName}" autocomplete="name">
+            <span class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
+        </label>
+        <label>Email
+            <input type="email" th:field="*{email}" autocomplete="email">
+            <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </label>
+        <label>Phone
+            <input type="tel" th:field="*{phone}" autocomplete="tel" placeholder="519-555-0101">
+            <span class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+        </label>
+        <label>Position
+            <select th:field="*{position}">
+                <option value="">Choose...</option>
+                <option th:each="p : ${positions}" th:value="${p}" th:text="${p.label}">Surgeon</option>
+            </select>
+            <span class="field-error" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></span>
+        </label>
+        <label>Years of experience
+            <input type="number" min="2" max="60" th:field="*{yearsExperience}">
+            <span class="field-error" th:if="${#fields.hasErrors('yearsExperience')}" th:errors="*{yearsExperience}"></span>
+        </label>
+        <label>When are you available?
+            <input type="text" th:field="*{availability}" placeholder="e.g. Weekdays, from January">
+            <span class="field-error" th:if="${#fields.hasErrors('availability')}" th:errors="*{availability}"></span>
+        </label>
+        <button type="submit">Send application</button>
+    </form>
+</main>
+</body>
+</html>

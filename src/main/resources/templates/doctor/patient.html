@@ -5,7 +5,9 @@
 <header th:replace="~{fragments :: nav}"></header>
 <main>
     <p><a th:href="@{/doctor/patients}">&larr; Back to my patients</a></p>
+    <div th:replace="~{fragments :: flash}"></div>
     <h1 th:text="${patient.fullName}">Alex Morgan</h1>
+    <p class="muted small">Opening this record is logged, and the patient can see that you viewed it.</p>
 
     <dl class="summary">
         <dt>Date of birth</dt>
@@ -25,6 +27,20 @@
     <h2>Medical history</h2>
     <!-- th:text escapes HTML, so text a patient typed can never inject a script into this page. -->
     <p class="prewrap" th:text="${patient.medicalHistory} ?: 'Nothing recorded.'">Seasonal allergies.</p>
+
+    <h2 id="notes">Clinical notes</h2>
+    <form th:action="@{/doctor/patients/{id}/notes(id=${patient.id})}" method="post" class="stack">
+        <label>Add a note
+            <textarea name="body" rows="3" maxlength="4000" required
+                      placeholder="Notes can't be edited later. To correct one, add a new note."></textarea>
+        </label>
+        <div><button type="submit">Add note</button></div>
+    </form>
+    <p th:if="${#lists.isEmpty(notes)}" class="muted">No notes yet.</p>
+    <article th:each="n : ${notes}" class="card">
+        <p class="muted small" th:text="${n.doctor.fullName + ' · ' + #temporals.format(n.createdAt, 'd MMM yyyy, h:mm a')}">Dr. Jordan Patel · 1 Jan 2030</p>
+        <p class="prewrap" th:text="${n.body}">Note text</p>
+    </article>
 
     <h2>Appointments with you</h2>
     <table>

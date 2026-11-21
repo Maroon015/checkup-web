@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Job applications')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/admin}">&larr; Admin overview</a></p>
+    <h1>Job applications</h1>
+
+    <p th:if="${#lists.isEmpty(applications)}" class="muted">No applications yet.</p>
+    <table th:unless="${#lists.isEmpty(applications)}">
+        <thead><tr><th>Submitted</th><th>Name</th><th>Position</th><th>Experience</th><th>Availability</th><th>Contact</th></tr></thead>
+        <tbody>
+            <tr th:each="a : ${applications}">
+                <td th:text="${#temporals.format(a.submittedAt, 'd MMM yyyy')}">1 Jan 2030</td>
+                <td th:text="${a.fullName}">Jamie Rivera</td>
+                <td th:text="${a.position.label}">Pharmacist</td>
+                <td th:text="${a.yearsExperience + ' years'}">5 years</td>
+                <td th:text="${a.availability}">Weekdays</td>
+                <td>
+                    <a th:href="${'mailto:' + a.email}" th:text="${a.email}">jamie@example.com</a><br>
+                    <span th:text="${#strings.substring(a.phone,0,3) + '-' + #strings.substring(a.phone,3,6) + '-' + #strings.substring(a.phone,6,10)}">519-555-0123</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

@@ -71,8 +71,17 @@ public class ProfileController {
         return "redirect:/patient/profile#phones";
     }
 
+    /** "Who has seen or changed my record" (from the audit log). */
+    @GetMapping("/patient/access-log")
+    public String accessLog(@AuthenticationPrincipal CurrentUser me, Model model) {
+        model.addAttribute("entries", patientService.accessLog(me.getId()));
+        model.addAttribute("myUserId", me.getId());
+        return "patient/access-log";
+    }
+
     private void addPageData(Model model, Patient patient) {
         model.addAttribute("patient", patient);
+        model.addAttribute("notes", patientService.notesForOwnRecord(patient.getUser().getId()));
         model.addAttribute("bloodTypes", BloodType.values());
         model.addAttribute("phoneTypes", PhoneType.values());
     }

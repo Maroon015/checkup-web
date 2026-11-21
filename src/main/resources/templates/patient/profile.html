@@ -7,7 +7,8 @@
     <p><a th:href="@{/patient}">&larr; Back to my appointments</a></p>
     <div th:replace="~{fragments :: flash}"></div>
     <h1>My record</h1>
-    <p class="muted">Email (your login): <span th:text="${patient.email}">alex@example.com</span></p>
+    <p class="muted">Email (your login): <span th:text="${patient.email}">alex@example.com</span>
+        · <a th:href="@{/patient/access-log}">Who has seen my record</a></p>
 
     <form th:action="@{/patient/profile}" th:object="${form}" method="post" class="grid-form" novalidate>
         <label>First name
@@ -83,6 +84,13 @@
         <label>Number <input type="tel" name="number" placeholder="519-555-0101" autocomplete="tel" required></label>
         <button type="submit">Add number</button>
     </form>
+
+    <h2 id="notes">Notes from your doctors</h2>
+    <p th:if="${#lists.isEmpty(notes)}" class="muted">No notes yet.</p>
+    <article th:each="n : ${notes}" class="card">
+        <p class="muted small" th:text="${n.doctor.fullName + ' · ' + #temporals.format(n.createdAt, 'd MMM yyyy, h:mm a')}">Dr. Jordan Patel · 1 Jan 2030</p>
+        <p class="prewrap" th:text="${n.body}">Note text</p>
+    </article>
 </main>
 </body>
 </html>

@@ -12,6 +12,10 @@
         <li><strong th:text="${patientCount}">0</strong> patients</li>
         <li><strong th:text="${appointmentCount}">0</strong> appointments</li>
     </ul>
+    <p>
+        <a class="button secondary" th:href="@{/admin/audit}">Audit log</a>
+        <a class="button secondary" th:href="@{/admin/applications}">Job applications</a>
+    </p>
 </main>
 </body>
 </html>

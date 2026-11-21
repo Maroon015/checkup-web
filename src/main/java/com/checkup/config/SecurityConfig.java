@@ -21,7 +21,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // Public pages
-                .requestMatchers("/", "/login", "/register", "/css/**", "/error").permitAll()
+                .requestMatchers("/", "/login", "/register", "/careers", "/css/**", "/error").permitAll()
                 // Development-only database browser (turned off in production in step 7)
                 .requestMatchers("/h2-console/**").permitAll()
                 // Each area is locked to one role

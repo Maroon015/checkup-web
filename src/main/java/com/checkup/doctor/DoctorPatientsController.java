@@ -5,21 +5,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.checkup.account.CurrentUser;
 import com.checkup.appointment.AppointmentRepository;
+import com.checkup.patient.InvalidNoteException;
 import com.checkup.patient.Patient;
 import com.checkup.patient.PatientRepository;
 import com.checkup.patient.PatientService;
 import com.checkup.web.NotFoundException;
 
 /**
- * A doctor's patients and their records (read-only for now; doctor edits come with the
- * audit log in step 6, so every change to a record is recorded).
+ * A doctor's patients, their records (each view is audit-logged) and clinical notes.
  *
  * Old version: Doctor.viewPatientRecords(fName, lName) printed ANY patient's full record
- * to any doctor who typed a name. Here a doctor only sees patients booked with them.
+ * to any doctor who typed a name, and nothing recorded that it happened.
  */
 @Controller
 public class DoctorPatientsController {
@@ -49,11 +51,24 @@ public class DoctorPatientsController {
 
     @GetMapping("/doctor/patients/{patientId}")
     public String record(@AuthenticationPrincipal CurrentUser me, @PathVariable Long patientId, Model model) {
-        Patient patient = patientService.recordForDoctor(me.getId(), patientId); // 404 if not theirs
+        Patient patient = patientService.recordForDoctor(me.getId(), patientId); // 404 if not theirs; logged
         Doctor doctor = doctors.findByUser_Id(me.getId()).orElseThrow(NotFoundException::new);
         model.addAttribute("patient", patient);
+        model.addAttribute("notes", patientService.notesForDoctor(me.getId(), patientId));
         model.addAttribute("appointments",
                 appointments.findByDoctor_IdAndPatient_IdOrderByStartTimeDesc(doctor.getId(), patientId));
         return "doctor/patient";
+    }
+
+    @PostMapping("/doctor/patients/{patientId}/notes")
+    public String addNote(@AuthenticationPrincipal CurrentUser me, @PathVariable Long patientId,
+                          @RequestParam String body, RedirectAttributes redirect) {
+        try {
+            patientService.addNote(me.getId(), patientId, body);
+            redirect.addFlashAttribute("success", "Note added.");
+        } catch (InvalidNoteException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/doctor/patients/" + patientId + "#notes";
     }
 }
