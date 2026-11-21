@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Find a clinic')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/patient}">&larr; Back to my appointments</a></p>
+    <h1>Find a clinic</h1>
+
+    <!-- A GET form: the city ends up in the URL (?city=London), so results can be bookmarked. -->
+    <form th:action="@{/patient/clinics}" method="get" class="row">
+        <label>City
+            <select name="city">
+                <option th:each="c : ${cities}" th:value="${c}" th:text="${c}"
+                        th:selected="${city != null and #strings.equalsIgnoreCase(c, city)}">London</option>
+            </select>
+        </label>
+        <button type="submit">Show clinics</button>
+    </form>
+
+    <th:block th:if="${clinics != null}">
+        <p th:if="${clinics.isEmpty()}" class="muted">No clinics found in <span th:text="${city}">that city</span>.</p>
+        <section th:each="entry : ${clinics}" class="card">
+            <h2 th:text="${entry.key.name}">Northside Family Clinic</h2>
+            <p class="muted" th:text="${entry.key.streetAddress + ', ' + entry.key.city}">120 Maple Ave, London</p>
+            <ul class="plain">
+                <li th:each="d : ${entry.value}">
+                    <strong th:text="${d.fullName}">Dr. Jordan Patel</strong>
+                    <span class="muted" th:text="${'· ' + d.specialty}">· Family Medicine</span>
+                    <a class="button small secondary" th:href="@{/patient/book/{id}(id=${d.id})}">Book</a>
+                </li>
+            </ul>
+        </section>
+    </th:block>
+</main>
+</body>
+</html>

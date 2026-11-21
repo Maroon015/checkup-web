@@ -27,6 +27,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @EntityGraph(attributePaths = {"patient"})
     List<Appointment> findByDoctor_IdAndStartTimeGreaterThanEqualOrderByStartTime(Long doctorId, LocalDateTime from);
 
+    /** Has this patient got any non-cancelled appointment with this doctor? (record access rule) */
+    boolean existsByDoctor_IdAndPatient_IdAndStatusNot(Long doctorId, Long patientId, AppointmentStatus status);
+
+    /** One patient's appointments with one doctor, newest first (doctor's view of a record). */
+    List<Appointment> findByDoctor_IdAndPatient_IdOrderByStartTimeDesc(Long doctorId, Long patientId);
+
     /**
      * The doctor's active (not cancelled or completed) appointments that overlap [from, to).
      * Two time ranges overlap when each one starts before the other ends.

@@ -11,6 +11,10 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     // "Clinic_Id" walks into the clinic relationship: WHERE clinic_id = ?
     List<Doctor> findByClinic_IdOrderByLastName(Long clinicId);
 
+    /** Doctors at clinics in one city, with the clinic loaded ("find a clinic" page). */
+    @EntityGraph(attributePaths = "clinic")
+    List<Doctor> findByClinic_CityIgnoreCaseOrderByClinic_NameAscLastNameAsc(String city);
+
     // Optional = "might not exist". Forces the caller to handle the not-found case
     // instead of getting a null by surprise.
     Optional<Doctor> findByEmailIgnoreCase(String email);

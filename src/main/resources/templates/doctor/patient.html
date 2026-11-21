@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Patient record')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/doctor/patients}">&larr; Back to my patients</a></p>
+    <h1 th:text="${patient.fullName}">Alex Morgan</h1>
+
+    <dl class="summary">
+        <dt>Date of birth</dt>
+        <dd th:text="${#temporals.format(patient.dateOfBirth, 'd MMMM yyyy') + ' (age ' + patient.age + ')'}">12 April 1991 (age 35)</dd>
+        <dt>Blood type</dt><dd th:text="${patient.bloodType != null} ? ${patient.bloodType.label} : 'Not recorded'">O+</dd>
+        <dt>Height</dt><dd th:text="${patient.heightCm != null} ? ${patient.heightCm + ' cm'} : 'Not recorded'">172 cm</dd>
+        <dt>Weight</dt><dd th:text="${patient.weightKg != null} ? ${patient.weightKg + ' kg'} : 'Not recorded'">68 kg</dd>
+        <dt>Email</dt><dd th:text="${patient.email}">alex@example.com</dd>
+        <dt>Address</dt>
+        <dd th:text="${#strings.isEmpty(patient.street)} ? 'Not recorded' : ${(patient.unitNumber != null ? patient.unitNumber + ' - ' : '') + patient.street + ', ' + patient.city}">12 - Maple Ave, London</dd>
+        <th:block th:each="p : ${patient.phones}">
+            <dt th:text="${#strings.capitalize(#strings.toLowerCase(p.type)) + ' phone'}">Personal phone</dt>
+            <dd th:text="${#strings.substring(p.number,0,3) + '-' + #strings.substring(p.number,3,6) + '-' + #strings.substring(p.number,6,10)}">519-555-0101</dd>
+        </th:block>
+    </dl>
+
+    <h2>Medical history</h2>
+    <!-- th:text escapes HTML, so text a patient typed can never inject a script into this page. -->
+    <p class="prewrap" th:text="${patient.medicalHistory} ?: 'Nothing recorded.'">Seasonal allergies.</p>
+
+    <h2>Appointments with you</h2>
+    <table>
+        <thead><tr><th>When</th><th>Reason</th><th>Status</th></tr></thead>
+        <tbody>
+            <tr th:each="a : ${appointments}">
+                <td th:text="${#temporals.format(a.startTime, 'EEE d MMM yyyy, h:mm a')}">Mon 1 Jan 2030, 9:00 AM</td>
+                <td th:text="${a.reason}">Annual check-up</td>
+                <td><span class="status" th:classappend="${#strings.toLowerCase(a.status)}" th:text="${a.status}">CONFIRMED</span></td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

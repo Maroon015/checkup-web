@@ -6,7 +6,11 @@
 <main>
     <div th:replace="~{fragments :: flash}"></div>
     <h1>Hi, <span th:text="${patient.firstName}">Alex</span></h1>
-    <p><a class="button" th:href="@{/patient/book}">Book an appointment</a></p>
+    <p>
+        <a class="button" th:href="@{/patient/book}">Book an appointment</a>
+        <a class="button secondary" th:href="@{/patient/clinics}">Find a clinic</a>
+        <a class="button secondary" th:href="@{/patient/profile}">My record</a>
+    </p>
 
     <h2>My appointments</h2>
     <p th:if="${#lists.isEmpty(appointments)}" class="muted">You don't have any appointments yet.</p>

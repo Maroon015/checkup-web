@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('My patients')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/doctor}">&larr; Back to my schedule</a></p>
+    <h1>My patients</h1>
+    <p class="muted">Patients with a current or past appointment with you.</p>
+
+    <form th:action="@{/doctor/patients}" method="get" class="row">
+        <label>Last name <input type="search" name="lastName" th:value="${lastName}" placeholder="e.g. Morgan"></label>
+        <button type="submit">Search</button>
+    </form>
+
+    <p th:if="${#lists.isEmpty(patients)}" class="muted">No patients found.</p>
+    <table th:unless="${#lists.isEmpty(patients)}">
+        <thead><tr><th>Name</th><th>Age</th><th>City</th><th></th></tr></thead>
+        <tbody>
+            <tr th:each="p : ${patients}">
+                <td th:text="${p.lastName + ', ' + p.firstName}">Morgan, Alex</td>
+                <td th:text="${p.age}">35</td>
+                <td th:text="${p.city} ?: '—'">London</td>
+                <td><a class="button small secondary" th:href="@{/doctor/patients/{id}(id=${p.id})}">View record</a></td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

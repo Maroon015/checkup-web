@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('My record')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/patient}">&larr; Back to my appointments</a></p>
+    <div th:replace="~{fragments :: flash}"></div>
+    <h1>My record</h1>
+    <p class="muted">Email (your login): <span th:text="${patient.email}">alex@example.com</span></p>
+
+    <form th:action="@{/patient/profile}" th:object="${form}" method="post" class="grid-form" novalidate>
+        <label>First name
+            <input type="text" th:field="*{firstName}" autocomplete="given-name">
+            <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+        </label>
+        <label>Last name
+            <input type="text" th:field="*{lastName}" autocomplete="family-name">
+            <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+        </label>
+        <label>Date of birth
+            <input type="date" th:field="*{dateOfBirth}">
+            <span class="field-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
+        </label>
+        <label>Blood type
+            <select th:field="*{bloodType}">
+                <option value="">Not sure</option>
+                <option th:each="b : ${bloodTypes}" th:value="${b}" th:text="${b.label}">O+</option>
+            </select>
+        </label>
+        <label>Street
+            <input type="text" th:field="*{street}" autocomplete="address-line1">
+            <span class="field-error" th:if="${#fields.hasErrors('street')}" th:errors="*{street}"></span>
+        </label>
+        <label>Unit
+            <input type="text" th:field="*{unitNumber}" autocomplete="address-line2">
+            <span class="field-error" th:if="${#fields.hasErrors('unitNumber')}" th:errors="*{unitNumber}"></span>
+        </label>
+        <label>City
+            <input type="text" th:field="*{city}" autocomplete="address-level2">
+            <span class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+        </label>
+        <label>Height (cm)
+            <input type="number" step="0.1" min="1" th:field="*{heightCm}">
+            <span class="field-error" th:if="${#fields.hasErrors('heightCm')}" th:errors="*{heightCm}"></span>
+        </label>
+        <label>Weight (kg)
+            <input type="number" step="0.1" min="1" th:field="*{weightKg}">
+            <span class="field-error" th:if="${#fields.hasErrors('weightKg')}" th:errors="*{weightKg}"></span>
+        </label>
+        <label class="wide">Medical history
+            <textarea rows="4" maxlength="2000" th:field="*{medicalHistory}"
+                      placeholder="Allergies, past surgeries, ongoing conditions..."></textarea>
+            <span class="field-error" th:if="${#fields.hasErrors('medicalHistory')}" th:errors="*{medicalHistory}"></span>
+        </label>
+        <div class="wide"><button type="submit">Save my record</button></div>
+    </form>
+
+    <h2 id="phones">Phone numbers</h2>
+    <p th:if="${#lists.isEmpty(patient.phones)}" class="muted">No phone numbers yet.</p>
+    <table th:unless="${#lists.isEmpty(patient.phones)}">
+        <thead><tr><th>Type</th><th>Number</th><th></th></tr></thead>
+        <tbody>
+            <tr th:each="p : ${patient.phones}">
+                <td th:text="${#strings.capitalize(#strings.toLowerCase(p.type))}">Personal</td>
+                <!-- Stored as 10 digits; shown as 519-555-0101 -->
+                <td th:text="${#strings.substring(p.number,0,3) + '-' + #strings.substring(p.number,3,6) + '-' + #strings.substring(p.number,6,10)}">519-555-0101</td>
+                <td>
+                    <form th:action="@{/patient/profile/phones/{id}/delete(id=${p.id})}" method="post">
+                        <button type="submit" class="secondary small">Remove</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <form th:action="@{/patient/profile/phones}" method="post" class="row">
+        <label>Type
+            <select name="type">
+                <option th:each="t : ${phoneTypes}" th:value="${t}"
+                        th:text="${#strings.capitalize(#strings.toLowerCase(t))}">Personal</option>
+            </select>
+        </label>
+        <label>Number <input type="tel" name="number" placeholder="519-555-0101" autocomplete="tel" required></label>
+        <button type="submit">Add number</button>
+    </form>
+</main>
+</body>
+</html>

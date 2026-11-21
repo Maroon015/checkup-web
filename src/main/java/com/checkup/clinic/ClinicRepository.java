@@ -3,6 +3,7 @@ package com.checkup.clinic;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * Database access for clinics. There's no code to write: Spring Data reads the method
@@ -15,4 +16,8 @@ public interface ClinicRepository extends JpaRepository<Clinic, Long> {
 
     // -> SELECT * FROM clinics WHERE LOWER(city) = LOWER(?) ORDER BY name
     List<Clinic> findByCityIgnoreCaseOrderByName(String city);
+
+    /** Every city that has a clinic, for the "find a clinic" drop-down. */
+    @Query("select distinct c.city from Clinic c order by c.city")
+    List<String> findAllCities();
 }
