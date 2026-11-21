@@ -1,0 +1,50 @@
+# Render Blueprint: describes the whole deployment as code.
+# In Render: New > Blueprint > pick this repo > Apply. Render then creates the PostgreSQL
+# database and the web service below, and redeploys on every push to main.
+#
+# Free plans: the web service sleeps when nobody uses it (the first visit after that takes
+# about a minute to wake up), and free databases have time and size limits. Check Render's
+# current free-tier terms.
+
+databases:
+  - name: checkup-db
+    plan: free
+    databaseName: checkup
+    user: checkup
+    ipAllowList: []          # no access from the internet; only Render services can connect
+
+services:
+  - type: web
+    name: checkup-web
+    runtime: docker          # build with the Dockerfile in this repo
+    plan: free
+    healthCheckPath: /login  # Render checks this page answers before sending traffic
+    autoDeploy: true
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # The database connection, filled in by Render from the database above.
+      # application-prod.properties builds the JDBC URL from these pieces.
+      - key: DB_HOST
+        fromDatabase:
+          name: checkup-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: checkup-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: checkup-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: checkup-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: checkup-db
+          property: password
+      # Demo accounts and fake data so visitors can click straight in.
+      - key: DEMO_DATA
+        value: "true"
